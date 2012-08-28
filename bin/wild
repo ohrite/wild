@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require 'wild'
+
+Wild::CLI.new.start
