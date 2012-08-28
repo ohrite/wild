@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Build script for Travis CI.
+
+set -e -x
+
+bundle exec rspec spec
