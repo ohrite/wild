@@ -1,5 +1,6 @@
 require "zk"
 require "zk-group"
+require 'wild/instance'
 
 class Wild::Agent
   GROUP_NAME = "agents"
