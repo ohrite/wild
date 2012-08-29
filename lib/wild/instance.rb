@@ -8,24 +8,6 @@ module Wild
       @member = register_with_zookeeper(instance_port)
     end
 
-    def port
-      @member.data
-    end
-
-    private
-
-    def connection
-      @connection
-    end
-
-    def group
-      @group ||= ZK::Group.new(connection, name).tap(&:create)
-    end
-
-    def register_with_zookeeper(port)
-      group.join(port)
-    end
-
     def instance_port
       server = TCPServer.new('127.0.0.1', 0)
       server.addr[1]

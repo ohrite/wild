@@ -3,23 +3,26 @@ require 'spec_helper'
 describe  Wild::Agent do
   include_context "zookeeper"
 
-  let(:agent) { Wild::Agent.new(zookeeper_host, '127.0.0.1') }
-  let(:path) { agent.zookeeper_path }
+  let(:agent) { Wild::Agent.new(zookeeper) }
+  let(:streetcar) { Wild::Streetcar.new(zookeeper) }
 
-  describe "the zookeeper group the agent creates" do
-    it "should record its ip address to the group" do
-      zookeeper.get(path).first.should == "127.0.0.1"
+  after do
+    zookeeper.rm_rf(Wild::Streetcar::DESIRE_PATH) if zookeeper.exists?('/desire')
+  end
+
+  describe "#reveal_desires" do
+    before { streetcar.desire('dirt_and_ice_cream', {tasty: true}) }
+
+    it "reveals a desire" do
+      agent.reveal_desires.should == ['dirt_and_ice_cream']
     end
 
-    it "should remove the agent's ip address when the agent disconnects" do
-      zookeeper.exists?(path).should be
-      agent.send(:connection).close!
-      zookeeper.exists?(path).should_not be
-    end
+    describe "with multiple desires" do
+      before { streetcar.desire('tickling_with_goose_feathers', {extra_tickly: true}) }
 
-    it "should keep track of all agents" do
-      sleep 0.1 while agent.peers.empty?
-      agent.peers.should include '127.0.0.1'
+      it "reveals each desire" do
+        agent.reveal_desires.should == ['tickling_with_goose_feathers', 'dirt_and_ice_cream']
+      end
     end
   end
 end
