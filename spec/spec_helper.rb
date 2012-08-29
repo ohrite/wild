@@ -1,4 +1,4 @@
-$: << File.expand_path('../../lib/wild', __FILE__)
+$: << File.expand_path('../../lib', __FILE__)
 
 require 'rspec'
 require 'wild'

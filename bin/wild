@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
-require 'wild'
+$: << File.expand_path('../../lib', __FILE__)
+require 'wild/cli'
 
-Wild::CLI.new.start
+Wild::CLI.start
