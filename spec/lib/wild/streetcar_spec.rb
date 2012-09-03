@@ -4,25 +4,33 @@ describe Wild::Streetcar do
   include_context 'zookeeper'
 
   after do
-    zookeeper.rm_rf(Wild::Streetcar::DESIRE_PATH) if zookeeper.exists?('/desire')
+    zookeeper.rm_rf(streetcar.path) if zookeeper.exists?('/desire')
   end
 
-  let(:streetcar) { Wild::Streetcar.new(zookeeper) }
+  let(:streetcar) { Wild::Streetcar.new(zookeeper, '/desire') }
 
-  describe '.desire' do
+  describe '.add' do
     it "can create a desired instance" do
-      streetcar.desire("vivien_leigh", {gams: 'nice'})
-      zookeeper.exists?('/desire/vivien_leigh').should be_true
-      zookeeper.get('/desire/vivien_leigh').first.should == "{\"gams\":\"nice\"}"
+      streetcar.add("stella", {gams: 'nice'})
+      zookeeper.exists?('/desire/stella').should be_true
+      zookeeper.get('/desire/stella').first.should == "{\"gams\":\"nice\"}"
     end
   end
 
-  describe '.spurn' do
-    before { streetcar.desire("marlon_brando", {dancing: 'no'}) }
+  describe "when an instance has been desired" do
+    before { streetcar.add("stanley", {background: 'army'}) }
 
-    it "can delete an instance" do
-      streetcar.spurn('marlon_brando') # :(
-      zookeeper.exists?('/desire/marlon_brando').should be_false
+    describe '.remove' do
+      it "can delete an instance" do
+        streetcar.remove('stanley')
+        zookeeper.exists?('/desire/stanley').should be_false
+      end
+    end
+
+    describe '.each' do
+      it "should build enumerable functions" do
+        streetcar.should include 'stanley'
+      end
     end
   end
 end
