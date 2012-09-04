@@ -10,10 +10,15 @@ describe Wild::Streetcar do
   let(:streetcar) { Wild::Streetcar.new(zookeeper, '/desire') }
 
   describe '.add' do
+    before { streetcar.add("stella", {gams: 'nice'}) }
+    
     it "can create a desired instance" do
-      streetcar.add("stella", {gams: 'nice'})
       zookeeper.exists?('/desire/stella').should be_true
       zookeeper.get('/desire/stella').first.should == "{\"gams\":\"nice\"}"
+    end
+
+    it "does not bail if the instance already exists" do
+      expect { streetcar.add("stella", {gams: 'nice'}) }.to_not raise_error
     end
   end
 
@@ -21,9 +26,14 @@ describe Wild::Streetcar do
     before { streetcar.add("stanley", {background: 'army'}) }
 
     describe '.remove' do
+      before { streetcar.remove('stanley') }
+
       it "can delete an instance" do
-        streetcar.remove('stanley')
         zookeeper.exists?('/desire/stanley').should be_false
+      end
+
+      it "does not bail if the instance does not exist" do
+        expect { streetcar.remove("stella") }.to_not raise_error
       end
     end
 

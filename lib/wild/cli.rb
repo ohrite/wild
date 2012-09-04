@@ -1,25 +1,26 @@
 require 'thor'
-require 'wild/agent'
+require 'wild'
 
 class Wild::CLI < Thor
-  desc 'start', 'Start an agent.'
-  def start(destination, data = local_ip)
-    agent = Wild::Agent.new(destination, data)
-    while true do
-      puts agent.peers
-      sleep 5
-    end
+  desc 'add', 'Adds a desire.'
+  def add(desire, data = {})
+    Wild::Streetcar.new(zookeeper, '/desire').add(desire, data)
   end
 
-  private
-
-  def local_ip
-    orig, Socket.do_not_reverse_lookup = Socket.do_not_reverse_lookup, true
-    UDPSocket.open do |s|
-      s.connect '8.8.8.8', 1
-      s.addr.last
-    end
+  desc 'start', 'Starts the agent.'
+  def start
+    agent.start
   ensure
-    Socket.do_not_reverse_lookup = orig
+    zookeeper.close!
+  end
+
+  no_tasks do
+    def agent
+      @agent ||= Wild::Agent.new(zookeeper)
+    end
+
+    def zookeeper
+      @zookeeper ||= ZK.new("localhost:2181")
+    end
   end
 end

@@ -5,9 +5,29 @@ describe  Wild::Agent do
 
   let(:agent) { Wild::Agent.new(zookeeper) }
 
+  before { agent.stub(:heartbeat).and_return(false) }
+
   after do
     zookeeper.rm_rf(agent.desire.path) if zookeeper.exists?('/desire')
     zookeeper.rm_rf(agent.reality.path) if zookeeper.exists?('/reality')
+  end
+
+  describe "#start" do
+    it "listens to streetcars" do
+      zookeeper.should_receive(:register).with(agent.desire.path)
+      zookeeper.should_receive(:register).with(agent.reality.path)
+      agent.start
+    end
+  end
+
+  describe "#ponder_reality" do
+    before { agent.desire.add('bottle_of_gin', tasty: true)}
+
+    it "adds missing desires to reality" do
+      agent.reality.should have(0).things
+      agent.ponder_reality
+      agent.reality.first.should == 'bottle_of_gin'
+    end
   end
 
   describe "#reveal_desires" do

@@ -13,12 +13,12 @@ class Wild::Streetcar
   def add(name, data)
     @zookeeper.mkdir_p(path)
     desire_path = File.join(path, name)
-    @zookeeper.create(desire_path, ::JSON.dump(data))
+    @zookeeper.create(desire_path, ::JSON.dump(data)) unless @zookeeper.exists?(desire_path)
   end
 
   def remove(name)
     desire_path = File.join(path, name)
-    @zookeeper.delete(desire_path)
+    @zookeeper.delete(desire_path) if @zookeeper.exists?(desire_path)
   end
 
   def each(&block)
