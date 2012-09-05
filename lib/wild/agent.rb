@@ -1,46 +1,65 @@
 require 'logger'
-require "zk"
-require "zk-group"
+require 'zk'
 require 'wild/streetcar'
-require 'wild/instance'
 
 class Wild::Agent
-  attr_reader :desire, :reality, :logger
+  attr_reader :desires, :reality, :instances
 
-  def initialize(zookeeper)
-    @logger ||= ::Logger.new(STDOUT).tap do |logger|
+  def self.logger
+    @@logger ||= ::Logger.new(STDOUT).tap do |logger|
       logger.level = ::Logger::DEBUG
     end
+  end
+
+  def initialize(zookeeper)
     @zookeeper = zookeeper
-    @desire = Wild::Streetcar.new(zookeeper, '/desire')
+    @desires = Wild::Streetcar.new(zookeeper, '/desires')
     @reality = Wild::Streetcar.new(zookeeper, '/reality')
+    @instances = []
+  end
+
+  def logger
+    self.class.logger
   end
 
   def start
-    logger.debug("Watching #{desire.path}")
-    @zookeeper.register(desire.path) { ponder_reality }
+    logger.debug("Watching #{desires.path}")
+
+    @zookeeper.register(desires.path) do |event|
+      logger.debug("Some horrible thing has happened #{event}")
+      ponder(event)
+    end
 
     logger.debug("Watching #{reality.path}")
-    @zookeeper.register(reality.path) { ponder_reality }
-    
-    ponder_reality
 
-    sleep 10 while heartbeat
+    @zookeeper.register(reality.path) do |event|
+      logger.debug("Some horrible thing has happened #{event}")
+      ponder(event)
+    end
+
+    ponder
+
+    sleep 1 while heartbeat
   end
 
   def heartbeat
-    logger.info "reality=#{reality.count} desire=#{desire.count}"
+    logger.info "reality=#{reality.count} desires=#{desires.count}"
     true
   end
 
-  def ponder_reality
-    world = reveal_desires
-    logger.debug("Current desires are #{world}")
-    reality.add(world.first, {})
-    logger.info("Added #{world.first} to reality, desires are now #{reveal_desires}")
+  def ponder(event = nil)
+    logger.debug("Current desires are #{reveal_desires}")
+
+    if reveal_desires.any?
+      latest = reveal_desires.first
+      reality.add(latest)
+      instances << Wild::Instance.new(zookeepeer, {})
+    end
+
+    logger.info("Added #{desires} to reality, desires are now #{reveal_desires}")
   end
 
   def reveal_desires
-    desire.to_a - reality.to_a
+    desires.to_a - reality.to_a
   end
 end

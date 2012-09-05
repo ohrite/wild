@@ -10,7 +10,7 @@ class Wild::Streetcar
     @path = streetcar_path
   end
 
-  def add(name, data)
+  def add(name, data = {})
     @zookeeper.mkdir_p(path)
     desire_path = File.join(path, name)
     @zookeeper.create(desire_path, ::JSON.dump(data)) unless @zookeeper.exists?(desire_path)

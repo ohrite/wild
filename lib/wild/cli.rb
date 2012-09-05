@@ -4,7 +4,7 @@ require 'wild'
 class Wild::CLI < Thor
   desc 'add', 'Adds a desire.'
   def add(desire, data = {})
-    Wild::Streetcar.new(zookeeper, '/desire').add(desire, data)
+    agent.desires.add(desire, data)
   end
 
   desc 'start', 'Starts the agent.'

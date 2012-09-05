@@ -13,17 +13,16 @@ shared_context "zookeeper" do
 
   let(:zookeeper_path) { Dir.mktmpdir("wild-zookeeper") }
 
-  let(:zookeeper_server) do
-    ZK::Server.new(:client_port => zookeeper_port, :base_dir => zookeeper_path)
+  let!(:zookeeper_server) do
+    ZK::Server.new(:client_port => zookeeper_port, :base_dir => zookeeper_path).tap{ |s| s.run }
   end
+
   let(:zookeeper_settings) { {:thread => :single} }
   let(:zookeeper_host) { "localhost:#{zookeeper_port}" }
 
-  before(:all) { zookeeper_server.run }
-
   let(:zookeeper) { ZK.new(zookeeper_host) }
 
-  after(:all) do
+  after do
     zookeeper_server.shutdown
     zookeeper_server.clobber!
     FileUtils.rm_rf(zookeeper_path)
