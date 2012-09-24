@@ -4,4 +4,4 @@ rvm:
 jdk:
   - openjdk6
 script: ./bin/ci
-install: apt-get install zookeeper
+install: sudo apt-get install zookeeper
