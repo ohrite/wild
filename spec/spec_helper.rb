@@ -1,9 +1,9 @@
-$: << File.expand_path('../../lib', __FILE__)
+$: << File.expand_path("../../lib", __FILE__)
 
-require 'pry'
-require 'rspec'
-require 'wild'
+require "zk-server"
+require "tmpdir"
+require "godot"
+require "pry"
+require "rspec"
 
-Dir.glob(File.expand_path('../contexts/**/*.rb', __FILE__)).each do |context|
-  require context
-end
+require "wild"

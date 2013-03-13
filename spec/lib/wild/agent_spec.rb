@@ -1,16 +1,35 @@
 require 'spec_helper'
 
 describe Wild::Agent do
-  include_context "zookeeper"
+  let(:zookeeper_port) do
+    begin
+      server = TCPServer.new('127.0.0.1', 0)
+      server.addr[1]
+    ensure
+      server.close if server
+    end
+  end
+
+  let(:zookeeper_path) { Dir.mktmpdir("wild-zookeeper") }
+
+  let!(:zookeeper_server) do
+    ZK::Server.new(:client_port => zookeeper_port, :base_dir => zookeeper_path).tap{ |s| s.run }
+  end
+
+  let(:zookeeper_settings) { {:thread => :single} }
+  let(:zookeeper_host) { "localhost:#{zookeeper_port}" }
+
+  let(:zookeeper) { ZK.new(zookeeper_host) }
+
+  after do
+    zookeeper_server.shutdown
+    zookeeper_server.clobber!
+    FileUtils.rm_rf(zookeeper_path)
+  end
 
   let(:agent) { Wild::Agent.new(zookeeper) }
 
   before { agent.stub(:heartbeat).and_return(false) }
-
-  after(:each)do
-    zookeeper.rm_rf(agent.desires.path) if zookeeper.exists?(agent.desires.path)
-    zookeeper.rm_rf(agent.reality.path) if zookeeper.exists?(agent.reality.path)
-  end
 
   describe "#start" do
     it "listens to streetcars" do

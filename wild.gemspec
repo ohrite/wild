@@ -14,9 +14,9 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'thor'
   s.add_dependency 'zk'
-  s.add_dependency 'zk-group'
   s.add_dependency 'zk-server'
 
+  s.add_development_dependency 'godot'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'guard-bundler'
   s.add_development_dependency 'guard-rspec'

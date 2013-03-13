@@ -3,7 +3,7 @@ require 'zk'
 require 'wild/streetcar'
 
 class Wild::Agent
-  attr_reader :desires, :reality, :instances
+  attr_reader :desires, :reality, :instances, :zookeeper
 
   def self.logger
     @@logger ||= ::Logger.new(STDOUT).tap do |logger|
@@ -25,14 +25,14 @@ class Wild::Agent
   def start
     logger.debug("Watching #{desires.path}")
 
-    @zookeeper.register(desires.path) do |event|
+    zookeeper.register(desires.path) do |event|
       logger.debug("Some horrible thing has happened #{event}")
       ponder(event)
     end
 
     logger.debug("Watching #{reality.path}")
 
-    @zookeeper.register(reality.path) do |event|
+    zookeeper.register(reality.path) do |event|
       logger.debug("Some horrible thing has happened #{event}")
       ponder(event)
     end
@@ -51,9 +51,8 @@ class Wild::Agent
     logger.debug("Current desires are #{reveal_desires}")
 
     if reveal_desires.any?
-      latest = reveal_desires.first
-      reality.add(latest)
-      instances << Wild::Instance.new(zookeepeer, {})
+      name_of_desire = reveal_desires.first
+      instances << Wild::Instance.new(reality, name_of_desire, {}).tap {|i| i.start}
     end
 
     logger.info("Added #{desires} to reality, desires are now #{reveal_desires}")
