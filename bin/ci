@@ -2,5 +2,5 @@
 # Build script for Travis CI.
 
 set -e -x
-
+bundle install
 bundle exec rspec spec

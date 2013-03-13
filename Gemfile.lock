@@ -9,7 +9,6 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    coderay (1.0.7)
     diff-lcs (1.1.3)
     godot (0.3.0)
     guard (1.3.2)
@@ -24,12 +23,6 @@ GEM
     little-plugger (1.1.3)
     logging (1.7.2)
       little-plugger (>= 1.1.3)
-    method_source (0.8)
-    pry (0.8.3)
-      coderay (>= 0.9.7)
-      method_source (>= 0.4.0)
-      ruby_parser (>= 2.0.5)
-      slop (>= 1.5.3)
     rb-fsevent (0.9.1)
     rspec (2.11.0)
       rspec-core (~> 2.11.0)
@@ -39,9 +32,6 @@ GEM
     rspec-expectations (2.11.3)
       diff-lcs (~> 1.1.3)
     rspec-mocks (2.11.2)
-    ruby_parser (2.3.1)
-      sexp_processor (~> 3.0)
-    sexp_processor (3.2.0)
     slop (3.2.0)
     slyphon-log4j (1.2.15)
     slyphon-zookeeper_jar (3.3.5)
@@ -64,7 +54,6 @@ DEPENDENCIES
   godot
   guard-bundler
   guard-rspec
-  pry
   rb-fsevent
   rspec
   terminal-notifier-guard
